@@ -156,7 +156,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-1.5-flash
 
 # Generative AI (Groq Failover & Fallback)
-GROQ_API_KEY=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
+GROQ_API_KEY=your_groq_api_key_here
 GROQ_MODEL=qwen/qwen3.8-27b
 
 # Sandbox Limits
@@ -205,7 +205,22 @@ docker-compose up --build -d
 
 ---
 
-## 8. Verification & Evaluation Report
+## 8. Deploy to Vercel
+
+Vercel serves the Vite frontend and runs the FastAPI API as a Python Function. The API is routed on the same domain under `/api`, so the frontend does not need a separate API URL.
+
+1. Import this repository into Vercel and keep the project root set to the repository root.
+2. Create a managed PostgreSQL database (for example, Neon) and add its pooled connection URL as `DATABASE_URL`. Use a SQLAlchemy-compatible URL such as `postgresql+psycopg://...`; the backend also normalizes `postgres://` and `postgresql://` URLs.
+3. Add `SECRET_KEY` as a long, random value. Optionally add `GEMINI_API_KEY`, `GROQ_API_KEY`, and the corresponding model variables to enable live AI responses.
+4. Deploy. Vercel uses `vercel.json` to build `frontend/` and route API requests to the FastAPI function. The backend creates its tables and seeds starter curriculum during application startup.
+
+Do not use the SQLite default for a Vercel deployment: function storage is ephemeral, so data would not persist. Keep secrets in Vercel Environment Variables, not in source control. If a Groq key was previously committed, revoke it and create a replacement before deploying.
+
+Vercel's Python function does not include the C++ or Java compilers installed by the Docker image, so those playground languages require a separate execution service or a host that provides the compilers. Docker Compose remains the recommended local setup when you need the complete execution environment.
+
+---
+
+## 9. Verification & Evaluation Report
 
 | Evaluation Rubric | Result | Details |
 |---|---|---|
@@ -217,5 +232,5 @@ docker-compose up --build -d
 
 ---
 
-## 9. License & Author
+## 10. License & Author
 Built with ❤️ by the Google DeepMind Advanced Agentic Coding team as a portfolio-grade AI coding mentor.
