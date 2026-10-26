@@ -207,16 +207,16 @@ docker-compose up --build -d
 
 ## 8. Deploy to Vercel
 
-Vercel serves the Vite frontend and runs the FastAPI API as a Python Function. The API is routed on the same domain under `/api`, so the frontend does not need a separate API URL.
+Vercel deploys the Vite frontend and FastAPI backend as separate services from this repository. The frontend is public on `/`; API requests under `/api/` route to the backend on the same domain, so the frontend does not need a separate API URL. The backend's other routes, such as `/docs` and `/health`, are not exposed by the current rewrites.
 
-1. Import this repository into Vercel and keep the project root set to the repository root.
+1. Import this repository into Vercel and keep the project root set to the repository root so it reads the root `vercel.json`.
 2. Create a managed PostgreSQL database (for example, Neon) and add its pooled connection URL as `DATABASE_URL`. Use a SQLAlchemy-compatible URL such as `postgresql+psycopg://...`; the backend also normalizes `postgres://` and `postgresql://` URLs.
 3. Add `SECRET_KEY` as a long, random value. Optionally add `GEMINI_API_KEY`, `GROQ_API_KEY`, and the corresponding model variables to enable live AI responses.
-4. Deploy. Vercel uses `vercel.json` to build `frontend/` and route API requests to the FastAPI function. The backend creates its tables and seeds starter curriculum during application startup.
+4. Deploy. Vercel builds `backend/` and `frontend/` as independent services using the configuration in `vercel.json`. The backend creates its tables and seeds starter curriculum during application startup.
 
 Do not use the SQLite default for a Vercel deployment: function storage is ephemeral, so data would not persist. Keep secrets in Vercel Environment Variables, not in source control. If a Groq key was previously committed, revoke it and create a replacement before deploying.
 
-Vercel's Python function does not include the C++ or Java compilers installed by the Docker image, so those playground languages require a separate execution service or a host that provides the compilers. Docker Compose remains the recommended local setup when you need the complete execution environment.
+The browser calls the backend through the public same-domain `/api/` rewrite, so there is no server-to-server service binding. Vercel service bindings are for runtime calls between services; they cannot supply a Vite build-time URL. Vercel's Python runtime does not include the C++ or Java compilers installed by the Docker image, so those playground languages require a separate execution service or a host that provides the compilers. Docker Compose remains the recommended local setup when you need the complete execution environment.
 
 ---
 
